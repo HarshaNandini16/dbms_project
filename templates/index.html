@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookExchange - Share Your Books</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookExchange</h1>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">Home</a>
+                {% if session.user_id %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('books') }}">Browse Books</a>
+                    <a href="{{ url_for('add_book') }}">Add Book</a>
+                    <a href="{{ url_for('profile') }}">Profile</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Exchange Books, Share Knowledge</h1>
+                <p>Join our community of book lovers! Share your books with others and discover new reads.</p>
+                {% if not session.user_id %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+                {% else %}
+                    <a href="{{ url_for('books') }}" class="btn btn-primary">Browse Books</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="container">
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📖</div>
+                    <h3>Share Your Books</h3>
+                    <p>List your books for exchange and find them new homes</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Exchange Easily</h3>
+                    <p>Connect with other readers and arrange exchanges</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Build Community</h3>
+                    <p>Chat with fellow book lovers and share recommendations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 BookExchange. Share the joy of reading!</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
