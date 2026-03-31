@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - BookExchange</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookExchange</h1>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">Home</a>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('books') }}">Browse Books</a>
+                <a href="{{ url_for('add_book') }}">Add Book</a>
+                <a href="{{ url_for('profile') }}" class="active">Profile</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1>My Profile</h1>
+            </div>
+            
+            <div class="profile-info section">
+                <h2>Personal Information</h2>
+                <p><strong>Username:</strong> {{ user[0] }}</p>
+                <p><strong>Email:</strong> {{ user[1] }}</p>
+                <p><strong>Full Name:</strong> {{ user[2] }}</p>
+                <p><strong>Location:</strong> {{ user[3] or 'Not specified' }}</p>
+                <p><strong>Phone:</strong> {{ user[4] or 'Not specified' }}</p>
+                <p><strong>Member Since:</strong> {{ user[5].strftime('%Y-%m-%d') if user[5] else 'N/A' }}</p>
+            </div>
+            
+            <div class="stats section">
+                <h2>Statistics</h2>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Books Listed</h3>
+                        <div class="stat-number">{{ books_count }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Exchanges Completed</h3>
+                        <div class="stat-number">{{ exchanges_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reviews section">
+                <h2>Reviews</h2>
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review-card">
+                            <p><strong>{{ review[3] }}</strong> rated {{ review[0] }}/5</p>
+                            <p>{{ review[1] }}</p>
+                            <small>{{ review[2].strftime('%Y-%m-%d') if review[2] else 'N/A' }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No reviews yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
