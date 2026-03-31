@@ -172,14 +172,25 @@ def dashboard():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT * FROM Books WHERE user_id=?
-    """, (session['user_id'],))
-
+    cursor.execute("SELECT * FROM Books WHERE user_id=?", (session['user_id'],))
     user_books = cursor.fetchall()
+
+    incoming_requests = []
+    outgoing_requests = []
+
     conn.close()
 
-    return render_template('dashboard.html', user_books=user_books)
+    return render_template(
+        'dashboard.html',
+        user_books=user_books,
+        incoming_requests=incoming_requests,
+        outgoing_requests=outgoing_requests
+    )
+    @app.route('/profile')
+def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('profile.html')
 
 
 @app.route('/add_book', methods=['GET', 'POST'])
