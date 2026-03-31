@@ -106,29 +106,24 @@ def register():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        try:
-            cursor.execute("SELECT user_id FROM Users WHERE username=? OR email=?", (username, email))
-            if cursor.fetchone():
-                flash('Username or email already exists!', 'danger')
-                return redirect(url_for('register'))
-
-            hashed_password = hash_password(password)
-
-            cursor.execute("""
-                INSERT INTO Users (username, email, password_hash, full_name, location, phone)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (username, email, hashed_password, full_name, location, phone))
-
-            conn.commit()
-            flash('Registration successful!', 'success')
-            return redirect(url_for('login'))
-
-        except Exception as e:
-            conn.rollback()
-            flash(str(e), 'danger')
-
-        finally:
+        cursor.execute("SELECT user_id FROM Users WHERE username=? OR email=?", (username, email))
+        if cursor.fetchone():
+            flash('Username or email already exists!')
             conn.close()
+            return redirect(url_for('register'))
+
+        hashed_password = hash_password(password)
+
+        cursor.execute("""
+            INSERT INTO Users (username, email, password_hash, full_name, location, phone)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (username, email, hashed_password, full_name, location, phone))
+
+        conn.commit()
+        conn.close()
+
+        flash('Registration successful!')
+        return redirect(url_for('login'))
 
     return render_template('register.html')
 
@@ -149,10 +144,9 @@ def login():
         if user and check_password(password, user['password_hash']):
             session['user_id'] = user['user_id']
             session['username'] = user['username']
-            flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
 
-        flash('Invalid username or password!', 'danger')
+        flash('Invalid username or password!')
 
     return render_template('login.html')
 
@@ -160,7 +154,6 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    flash('Logged out successfully!', 'success')
     return redirect(url_for('index'))
 
 
@@ -175,18 +168,12 @@ def dashboard():
     cursor.execute("SELECT * FROM Books WHERE user_id=?", (session['user_id'],))
     user_books = cursor.fetchall()
 
-    incoming_requests = []
-    outgoing_requests = []
-
     conn.close()
 
-    return render_template(
-        'dashboard.html',
-        user_books=user_books,
-        incoming_requests=incoming_requests,
-        outgoing_requests=outgoing_requests
-    )
-    @app.route('/profile')
+    return render_template('dashboard.html', user_books=user_books)
+
+
+@app.route('/profile')
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -227,7 +214,6 @@ def add_book():
         conn.commit()
         conn.close()
 
-        flash('Book added successfully!', 'success')
         return redirect(url_for('dashboard'))
 
     return render_template('add_book.html')
@@ -241,11 +227,9 @@ def books():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT * FROM Books WHERE status='available' AND user_id != ?
-    """, (session['user_id'],))
-
+    cursor.execute("SELECT * FROM Books WHERE status='available' AND user_id != ?", (session['user_id'],))
     books = cursor.fetchall()
+
     conn.close()
 
     return render_template('books.html', books=books)
