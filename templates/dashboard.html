@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BookExchange</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookExchange</h1>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">Home</a>
+                <a href="{{ url_for('dashboard') }}" class="active">Dashboard</a>
+                <a href="{{ url_for('books') }}">Browse Books</a>
+                <a href="{{ url_for('add_book') }}">Add Book</a>
+                <a href="{{ url_for('profile') }}">Profile</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Welcome, {{ session.username }}!</h1>
+        
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3>My Books</h3>
+                <div class="stat-number">{{ user_books|length }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Incoming Requests</h3>
+                <div class="stat-number">{{ incoming_requests|length }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Outgoing Requests</h3>
+                <div class="stat-number">{{ outgoing_requests|length }}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>My Books</h2>
+            {% if user_books %}
+                <div class="books-grid">
+                    {% for book in user_books %}
+                        <div class="book-card">
+                            <div class="book-info">
+                                <h3>{{ book[1] }}</h3>
+                                <p class="author">by {{ book[2] }}</p>
+                                <p>Genre: {{ book[3] }}</p>
+                                <p>Condition: {{ book[4] }}</p>
+                                <p>Status: <span class="status {{ book[5] }}">{{ book[5] }}</span></p>
+                                <small>Added: {{ book[7].strftime('%Y-%m-%d') if book[7] else 'N/A' }}</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>You haven't added any books yet. <a href="{{ url_for('add_book') }}">Add your first book!</a></p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>Incoming Exchange Requests</h2>
+            {% if incoming_requests %}
+                <table class="requests-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Requester</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in incoming_requests %}
+                        <tr>
+                            <td>{{ req[4] }} by {{ req[5] }}</td>
+                            <td>{{ req[6] }}</td>
+                            <td>{{ req[1] }}</td>
+                            <td>{{ req[3].strftime('%Y-%m-%d') if req[3] else 'N/A' }}</td>
+                            <td>{{ req[2] }}</td>
+                            <td>
+                                {% if req[2] == 'pending' %}
+                                    <button onclick="respondRequest({{ req[0] }}, 'accept')" class="btn btn-success btn-sm">Accept</button>
+                                    <button onclick="respondRequest({{ req[0] }}, 'reject')" class="btn btn-danger btn-sm">Reject</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No incoming requests.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>Outgoing Exchange Requests</h2>
+            {% if outgoing_requests %}
+                <table class="requests-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Owner</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in outgoing_requests %}
+                        <tr>
+                            <td>{{ req[4] }} by {{ req[5] }}</td>
+                            <td>{{ req[6] }}</td>
+                            <td>{{ req[1] }}</td>
+                            <td>{{ req[3].strftime('%Y-%m-%d') if req[3] else 'N/A' }}</td>
+                            <td>{{ req[2] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No outgoing requests.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
