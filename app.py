@@ -16,7 +16,9 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 Session(app)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-DB_NAME = 'bookexchange.db'
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_NAME = os.path.join(BASE_DIR, 'bookexchange.db')
 
 
 def get_db_connection():
