@@ -7,117 +7,44 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <h1>📚 BookExchange</h1>
-            </div>
-            <div class="nav-links">
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('books') }}" class="active">Browse Books</a>
-                <a href="{{ url_for('add_book') }}">Add Book</a>
-                <a href="{{ url_for('profile') }}">Profile</a>
-                <a href="{{ url_for('logout') }}">Logout</a>
-            </div>
-        </div>
-    </nav>
 
+<nav class="navbar">
     <div class="container">
-        <div class="books-header">
-            <h1>Available Books</h1>
-            <form method="GET" class="search-form">
-                <input type="text" name="search" placeholder="Search by title or author..." value="{{ search }}">
-                <select name="genre">
-                    <option value="">All Genres</option>
-                    {% for g in genres %}
-                        <option value="{{ g[0] }}" {% if selected_genre == g[0] %}selected{% endif %}>{{ g[0] }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-primary">Search</button>
-            </form>
+        <div class="nav-brand">
+            <h1>📚 BookExchange</h1>
         </div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('books') }}" class="active">Browse Books</a>
+            <a href="{{ url_for('add_book') }}">Add Book</a>
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+</nav>
 
-        <div class="books-grid">
+<div class="container">
+    <h1>Available Books</h1>
+
+    <div class="books-grid">
+        {% if books %}
             {% for book in books %}
                 <div class="book-card">
-                    <div class="book-image">
-                        {% if book[5] %}
-                            <img src="{{ book[5] }}" alt="{{ book[1] }}">
-                        {% else %}
-                            <div class="book-placeholder">📚</div>
-                        {% endif %}
-                    </div>
                     <div class="book-info">
-                        <h3>{{ book[1] }}</h3>
-                        <p class="author">by {{ book[2] }}</p>
-                        <p class="genre">Genre: {{ book[3] or 'Not specified' }}</p>
-                        <p class="condition">Condition: {{ book[4] }}</p>
-                        <p class="owner">Owner: {{ book[6] }}</p>
-                        <p class="location">Location: {{ book[8] or 'Not specified' }}</p>
-                        <button onclick="requestBook({{ book[0] }})" class="btn btn-success btn-sm">Request Exchange</button>
+                        <h3>{{ book['title'] }}</h3>
+                        <p>Author: {{ book['author'] }}</p>
+                        <p>Genre: {{ book['genre'] }}</p>
+                        <p>Condition: {{ book['condition'] }}</p>
+                        <p>Status: {{ book['status'] }}</p>
                     </div>
                 </div>
-            {% else %}
-                <p class="no-books">No books found. Check back later!</p>
             {% endfor %}
-        </div>
+        {% else %}
+            <p>No books available right now.</p>
+        {% endif %}
     </div>
+</div>
 
-    <!-- Modal for request message -->
-    <div id="requestModal" class="modal">
-        <div class="modal-content">
-            <h3>Send Exchange Request</h3>
-            <form id="requestForm">
-                <div class="form-group">
-                    <label for="requestMessage">Message to Owner:</label>
-                    <textarea id="requestMessage" placeholder="Write a message to the book owner..." rows="4"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Send Request</button>
-                <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        let currentBookId = null;
-        
-        function requestBook(bookId) {
-            currentBookId = bookId;
-            document.getElementById('requestModal').style.display = 'flex';
-        }
-        
-        function closeModal() {
-            document.getElementById('requestModal').style.display = 'none';
-        }
-        
-        document.getElementById('requestForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const message = document.getElementById('requestMessage').value;
-            
-            const formData = new FormData();
-            formData.append('message', message);
-            
-            const response = await fetch(`/request_book/${currentBookId}`, {
-                method: 'POST',
-                body: formData
-            });
-            
-            const result = await response.json();
-            if (response.ok) {
-                alert('Request sent successfully!');
-                closeModal();
-            } else {
-                alert(result.error);
-            }
-        };
-        
-        window.onclick = function(event) {
-            const modal = document.getElementById('requestModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-    </script>
 </body>
 </html>
